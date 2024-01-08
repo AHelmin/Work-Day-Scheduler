@@ -65,27 +65,27 @@ function colorBlocks() {
 };
 
 function writeStorage() {
-  var taskData = JSON.parse(localStorage.getItem('taskData') || '{}');
-  // console.log(taskData)
-  var taskDataLength = Object.keys(taskData).length
+  var taskData = JSON.parse(localStorage.getItem('taskData') || '[]');
+  console.log(taskData)
+  var taskDataLength = taskData.length
   console.log(taskDataLength)
-  
+  console.log(taskDataLength)
   for (var i = 0; i < taskDataLength; i++) {
     //add 9 to correct for the hour ids starting at 9
     var idCorrectValue = i + 9
     var selector = "#" + idCorrectValue 
     console.log(selector)
-    console.log(taskData[idCorrectValue].task)
-    $(selector).children().eq(1).text(taskData[idCorrectValue].task)
+    console.log(taskData[i].task)
+    $(selector).children().eq(1).text(taskData[i].task)
   }
 };
 
 hourBlockCont.on('click', '.saveBtn', function() {
   console.log('ok');
-  var taskData = JSON.parse(localStorage.getItem('taskData') || '{}');
+  var taskData = JSON.parse(localStorage.getItem('taskData') || '[]');
   var thisHourId = $(this).parent().attr('id');
   var thisHourTask = $(this).siblings('#text').val();
-  taskData[thisHourId] = {
+  taskData[thisHourId - 9] = {
     task: thisHourTask
   }
   localStorage.setItem('taskData', JSON.stringify(taskData));
