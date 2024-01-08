@@ -43,8 +43,7 @@ function createHourBlocks() {
       <i class="fas fa-save" aria-hidden="true"></i>
     </button>
   </div>`)
-  }
-}
+  }};
 
 function colorBlocks() {
   for (var i = 0; i < hourBlockCont.children().length; i++){
@@ -63,7 +62,7 @@ function colorBlocks() {
       child.removeClass('past', 'present').addClass('future');
     }
   }
-}
+};
 
 function writeStorage() {
   var taskData = JSON.parse(localStorage.getItem('taskData') || '{}');
@@ -79,7 +78,7 @@ function writeStorage() {
     console.log(taskData[idCorrectValue].task)
     $(selector).children().eq(1).text(taskData[idCorrectValue].task)
   }
-}
+};
 
 hourBlockCont.on('click', '.saveBtn', function() {
   console.log('ok');
@@ -102,7 +101,7 @@ function savedTimer(){
       $('#header-p').hide();
     }
   }, 1000)
-}
+};
 
 
 createHourBlocks();
