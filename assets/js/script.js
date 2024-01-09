@@ -1,36 +1,25 @@
-//TODO
-//setInterval to display time and to check time against hour blocks for css change--MAYBE DONT NEED THIS
-//change post 12 pm times to am/pm format--DONE
-//time diff function to be able to determine where the blocks lie relative to current time--DONE
-//label each hour block with 24h time--DONE
-//add event listener in jquery for the save hour block input text to local storage--DONE
-//ask about adding dayjs advance formats
 
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
 $(document).ready(function () {
 
   const now = dayjs();
-  // console.log(now);
   const nowHour = now.format('HH');
-  // console.log(nowHour);
   const hourBlockCont = $('#hour-block-container');
-  // console.log(hourBlockCont)
   const headerDay = $('#currentDay');
-  // console.log(headerDay);
-  $('#header-p').hide()
+  $('#header-p').hide();
 
-  
-  
-headerDay.text(now.format('dddd, MMMM D'))
+headerDay.text(now.format('dddd, MMMM D'));
 
+//writes the hours blocks in HTML uses loop variable to label the block id and text dynamically, and also dynamically builds the arrays of objects for local storage
 function createHourBlocks() {
+  var taskData = JSON.parse(localStorage.getItem('taskData') || '[]');
   for (var i = 9; i < 18; i++) {
+    var index = i - 9
+    if (!taskData[index] || taskData[index].task === '') {
+      taskData[index] = {task: ''}
+    }
     var blockId = i;
     if (i < 12) {
     var hourBlockText = i + 'AM';
-   //why doesn't let or const scope to the rest of the function, while var will????
   } else if ( i === 12) {
     var hourBlockText = i + 'PM'
   } else {
@@ -38,25 +27,25 @@ function createHourBlocks() {
   }
     hourBlockCont.append(`<div id="${blockId}" class="row time-block past">
     <div class="col-2 col-md-1 hour text-center py-3">${hourBlockText}</div>
-    <textarea id="text" class="col-8 col-md-10 description" rows="3"> </textarea>
+    <textarea class="text col-8 col-md-10 description" rows="3"> </textarea>
     <button id ="saveBtn" class="btn saveBtn col-2 col-md-1" aria-label="save">
       <i class="fas fa-save" aria-hidden="true"></i>
     </button>
   </div>`)
-  }};
+ 
+  }
+  localStorage.setItem('taskData', JSON.stringify(taskData));
+};
 
+  //uses the current time to change the CSS class which is responsible for the hour block background color
 function colorBlocks() {
   for (var i = 0; i < hourBlockCont.children().length; i++){
-    // console.log(hourBlockCont.children().length)
     var child = hourBlockCont.children().eq(i);
-    // console.log(child.text());
     var childHour = parseInt(child.attr('id'))
-    // console.log(childHour)
     var difference = parseInt(nowHour) - childHour;
-    // console.log(difference);
     if (difference > 0) {
       child.removeClass('present', 'future').addClass('past');
-    } else if (difference ===0) {
+    } else if (difference === 0) {
       child.removeClass('past', 'future').addClass('present');
     } else {
       child.removeClass('past', 'present').addClass('future');
@@ -64,35 +53,30 @@ function colorBlocks() {
   }
 };
 
+//writes storage to hour blocks, uses the index as a reference to the object, and to find and write to the correct hour block, and loops through the array
 function writeStorage() {
-  var taskData = JSON.parse(localStorage.getItem('taskData') || '[]');
-  console.log(taskData)
+  var taskData = JSON.parse(localStorage.getItem('taskData'));
   var taskDataLength = taskData.length
-  console.log(taskDataLength)
-  console.log(taskDataLength)
   for (var i = 0; i < taskDataLength; i++) {
     //add 9 to correct for the hour ids starting at 9
     var idCorrectValue = i + 9
     var selector = "#" + idCorrectValue 
-    console.log(selector)
-    console.log(taskData[i].task)
     $(selector).children().eq(1).text(taskData[i].task)
   }
 };
 
+//event listener attached to the hour block container, specifically listens to each button and saves tasks based on that id to local storage
 hourBlockCont.on('click', '.saveBtn', function() {
-  console.log('ok');
-  var taskData = JSON.parse(localStorage.getItem('taskData') || '[]');
+  var taskData = JSON.parse(localStorage.getItem('taskData'));
   var thisHourId = $(this).parent().attr('id');
-  var thisHourTask = $(this).siblings('#text').val();
-  taskData[thisHourId - 9] = {
-    task: thisHourTask
-  }
+  var thisHourTask = $(this).siblings('.text').val();
+  taskData[thisHourId - 9].task = thisHourTask
   localStorage.setItem('taskData', JSON.stringify(taskData));
   $('#header-p').show();
   savedTimer();
 });
 
+//this function is used to hide the task saved paragraph at the top of the page upon clicking the save button
 function savedTimer(){
   var secondsLeft = 1
   setInterval( function() {
